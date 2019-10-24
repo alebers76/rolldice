@@ -1,4 +1,6 @@
 import random
+from itertools import combinations_with_replacement as cwr
+from math import factorial
 
 def rolldie(dice):
     """Rolls a die one time, according to the size passed in."""
@@ -15,13 +17,28 @@ def rolldice(dice, numrolls):
     # Returns the set of rolled values, and the sum of the values.
     return {'total': player_total, 'rolls': rolls}
 
-def generate_rolls(dice, numrolls, all_rolls):
+def get_num_all_rolls(dice, numrolls):
+    """Generate the number of possible rolls for a set of dice."""
+    num_all_rolls = factorial(dice + numrolls - 1) / (factorial(numrolls) *
+            factorial (dice - 1))
+    return num_all_rolls
+
+def generate_rolls(dice, numrolls):
     """Generate all possible rolls for a set of dice."""
-    thisroll = []
-    recurse_roll(dice, numrolls, thisroll, 1, all_rolls)
+    dice_array = []
+    for i in range(dice):
+        dice_array.append(i+1)
+    return list(cwr(dice_array, numrolls))
+
+    # thisroll = []
+    # recurse_roll(dice, numrolls, thisroll, 1, all_rolls)
 
 def recurse_roll(dice, numrolls, thisroll, prev_die, all_rolls):
     """Recurse through the dice and roll them."""
+    # This has been deprecated in favor of the built-in function
+    #     itertools.combinations_with_replacement
+    # It was a pretty fun function to figure out, though...
+
     # Start at the number of the previous die in the roll to avoid duplicates
     # e.g. if previous die was a 3, start at 3 to make (3,3) because (3,2)
     # was already handled by (2,3)
@@ -102,21 +119,23 @@ def get_matches(all_rolls, player_total):
             matches.append(rollset)
     return matches
 
-def report_results(all_total, matching_rolls, player_total):
+def report_results(all_total, matching_total, player_total):
     """Print out all the match findings for the user."""
-    match_totals = len(matching_rolls)
-    match_percent = round(match_totals/all_total*100,1)
-    if match_totals == 1:
-        print("Out of " + str(all_total) + " rolls, there is 1 possible roll (" + 
+    match_percent = round(matching_total/all_total*100,1)
+    str_all_total = "{:,}".format(all_total)
+    str_matching_total = "{:,}".format(matching_total)
+    if matching_total == 1:
+        print("Out of " + str_all_total + " rolls, there is 1 possible roll (" + 
             str(match_percent) + "%) that sums to " + str(player_total) + ".")
     else:
-        print("Out of " + str(all_total) + " rolls, there are " + 
-            str(match_totals) + " possible rolls (" + str(match_percent) +
+        print("Out of " + str_all_total + " rolls, there are " + 
+            str_matching_total + " possible rolls (" + str(match_percent) +
             "%) that sum to " + str(player_total) + ".")
 
 def print_matches(matching_rolls):
     """Print all rolls that match the player's total."""
-    input("Press any key to see all matches...")
-    for rollset in matching_rolls:
-        print("\t", end="")
-        print(rollset)
+    see_matches = input("Enter 'y' to see all matches, or anything else to quit: ")
+    if see_matches.lower() == 'y':
+        for rollset in matching_rolls:
+            print("\t", end="")
+            print(rollset)

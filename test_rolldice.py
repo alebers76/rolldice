@@ -22,7 +22,7 @@ class TestDice(unittest.TestCase):
         """Test the report_results function."""
         capturedOutput = io.StringIO()                  # Create StringIO object
         sys.stdout = capturedOutput                     #  and redirect stdout.
-        report_results(len(self.test_allrolls), self.test_matchingrolls, 8)
+        report_results(len(self.test_allrolls), len(self.test_matchingrolls), 8)
         sys.stdout = sys.__stdout__                     # Reset redirect.
         self.assertEqual(capturedOutput.getvalue().strip(), "Out of 20 rolls, there are 3 possible rolls (15.0%) that sum to 8.")  
 
